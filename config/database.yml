@@ -81,10 +81,10 @@ test: &test
 #
 production:
   <<: *default
-  
+  url: <%= ENV['DATABASE_URL'] %>
   #database: serler_production_production
   #username: serler_production
-  DATABASE_URL = "postgres://ihnamwgylrwxcs:pgaN6cmqcpVJdXzahtUWB9TBy7@ec2-54-243-203-87.compute-1.amazonaws.com:5432/d7c52di60bjkrb"
+  #DATABASE_URL = "postgres://ihnamwgylrwxcs:pgaN6cmqcpVJdXzahtUWB9TBy7@ec2-54-243-203-87.compute-1.amazonaws.com:5432/d7c52di60bjkrb"
   #password: <%= ENV['SERLER_PRODUCTION_DATABASE_PASSWORD'] %>
 
 cucumber:
