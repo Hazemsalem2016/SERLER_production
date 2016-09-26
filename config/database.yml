@@ -81,9 +81,10 @@ test: &test
 #
 production:
   <<: *default
-  database: serler_production_production
+  DATABASE_URL="postgres://ihnamwgylrwxcs:pgaN6cmqcpVJdXzahtUWB9TBy7@ec2-54-243-203-87.compute-1.amazonaws.com:5432/d7c52di60bjkrb"
+  #database: serler_production_production
   #username: serler_production
-  password: <%= ENV['SERLER_PRODUCTION_DATABASE_PASSWORD'] %>
+  #password: <%= ENV['SERLER_PRODUCTION_DATABASE_PASSWORD'] %>
 
 cucumber:
   <<: *test
