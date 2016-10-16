@@ -61,6 +61,7 @@
         <li> <%= link_to 'Saved Search', search_history_path %> </li>
         <li> <%= link_to 'Browse', browse_path %> </li>
         <li> <%= link_to 'New Article', new_evidence_source_path %> </li>
+        <li> <%= link_to 'My Submissions', evidence_sources_my_submissions_path %> </li>
         <li> <a href='#'> Messages </a></li>
         <li> <a href='#'> Feedback </a></li>
       <% end %>
@@ -79,6 +80,8 @@
       
       <% if roles.include? :administrator %>
         <li> <%= link_to 'Published Articles', evidence_sources_published_path %> </li>
+        <li> <%= link_to 'Enter News', headlines_news_path %> </li>
+        <li> <%= link_to 'Enter Recent Articles', headlines_recent_articles_path %> </li>
         <li> <%= link_to 'ADMIN', welcome_admin_path %> </li>
       <% end %>
       

@@ -10,11 +10,23 @@ class EvidenceSourcesController < ApplicationController
     
     def new_submitted
         # moderator and administrator
+
+        roles = current_user.roles
+        if not roles.include? :moderator and roles.include? :administrator
+            redirect_to welcome_denied_path
+        end
+
         @evidence_sources = EvidenceSource.where 'status=?', 'NEW'
     end
     
     def rejected
         # admistrator ? maybe
+
+        roles = current_user.roles
+        if not roles.include? :moderator and roles.include? :administrator
+            redirect_to welcome_denied_path
+        end
+
         @evidence_sources = EvidenceSource.where 'status=?', 'REJECTED'
     end
     
@@ -26,6 +38,11 @@ class EvidenceSourcesController < ApplicationController
     def published
         # every one
         @evidence_sources = EvidenceSource.where 'status=?', 'PUBLISHED'
+
+        @editalbe = false
+        if current_user.roles.include? :administrator
+            @editable = true
+        end
     end
     
     def all
@@ -89,36 +106,38 @@ class EvidenceSourcesController < ApplicationController
         
         begin
             authors = params.require(:evidence_source)[:author]
-            authors.each do |a|
-                puts "==> " + a.to_s
-                
-                g = ''
-                f = ''
-                if a.include? ','
-                    c = a.index ','
-                    g = a[c+1..-1].strip
-                    f = a[0..c-1].strip
-                else
-                    c = a.rindex ' '
-                    g = a[0..c].strip
-                    f = a[c..-1].strip
-                end
-                
-                # puts '***** |' + a + '| ==> _' + g + '_' + f + '_'
-                
-                g_abbr = ''
-                begin
-                    g.split(' ').each do |s|
-                        g_abbr += s.strip()[0] + '. '
+            if not authors.nil?
+                authors.each do |a|
+                    puts "==> " + a.to_s
+                    
+                    g = ''
+                    f = ''
+                    if a.include? ','
+                        c = a.index ','
+                        g = a[c+1..-1].strip
+                        f = a[0..c-1].strip
+                    else
+                        c = a.rindex ' '
+                        g = a[0..c].strip
+                        f = a[c..-1].strip
                     end
+                    
+                    # puts '***** |' + a + '| ==> _' + g + '_' + f + '_'
+                    
+                    g_abbr = ''
+                    begin
+                        g.split(' ').each do |s|
+                            g_abbr += s.strip()[0] + '. '
+                        end
+                    end
+                    
+                    name = g + ' ' + f
+                    name_abbr = g_abbr + f
+                    
+                    author = @evidence_source.evidence_source_authors.create({
+                        name: name, name_abbr: name_abbr
+                    })
                 end
-                
-                name = g + ' ' + f
-                name_abbr = g_abbr + f
-                
-                author = @evidence_source.evidence_source_authors.create({
-                    name: name, name_abbr: name_abbr
-                })
             end
         end
 
@@ -126,12 +145,61 @@ class EvidenceSourcesController < ApplicationController
     end
     
     def show
-        puts "this is show"
-        puts params[:id]
+        @evidence_source = EvidenceSource.find(params[:id])
+
+        status = @evidence_source.status
+        roles = current_user.roles
+
+        @showable = false
+        @editable = false
+
+        if roles.include? :moderator
+            @sowable = true
+        end
+
+        if roles.include? :analyst
+            @showable = true
+            if status == 'ACCEPTED'
+                @editable = true
+            end
+        end
+
+        if roles.include? :administrator
+            @showable = true
+            if status == 'ACCEPTED' or status == 'PUBLISHED'
+                @editable = true
+            end
+        end
+
+        puts '============'
+        puts @evidence_source.submitter_id
+        puts current_user.id
+
+        if @evidence_source.submitter_id == current_user.id
+            @showable = true
+        end
+
+        if not @showable
+            redirect_to welcome_denied_path
+        end
     end
     
     def edit
         @evidence_source = EvidenceSource.find(params[:id])
+
+        roles = current_user.roles
+        @editable = false
+
+        if @evidence_source.status == 'ACCEPTED' 
+            if not roles.include? :analyst and not roles.include? :administrator
+                redirect_to welcome_denied_path
+            end
+        elsif @evidence_source.status == 'PUBLISHED'
+            if not roles.include? :administrator
+                redirect_to welcome_denied_path
+            end
+        else
+        end
     end
     
     def research_design
@@ -311,8 +379,10 @@ class EvidenceSourcesController < ApplicationController
                 rating_tenth: rating_tenth,   # FIXME
             })
             
-            se_methods.each do |mid|
-                new_ei.se_methods << SeMethod.find(mid)
+            if not se_methods.nil?
+                se_methods.each do |mid|
+                    new_ei.se_methods << SeMethod.find(mid)
+                end
             end
             
             new_ei.save
@@ -356,10 +426,12 @@ class EvidenceSourcesController < ApplicationController
                     ei_entry.se_methods.delete m
                 end
                 
-                se_methods.each do |mid|
-                    if not method_set_old.include? mid.to_s
-                        puts 'add new se_method:' + mid.to_s
-                        ei_entry.se_methods << SeMethod.find(mid)
+                if not se_methods.nil?
+                    se_methods.each do |mid|
+                        if not method_set_old.include? mid.to_s
+                            puts 'add new se_method:' + mid.to_s
+                            ei_entry.se_methods << SeMethod.find(mid)
+                        end
                     end
                 end
             end
