@@ -51,12 +51,16 @@
                             <div class="col-sm-8">
                                 <%= es.title %>
                             </div>
+                            <% if @editable %>
                             <div class="col-sm-2">
                                 <button type="button" class="accept-btn btn btn-success" data-new-status="ACCEPTED">ACCEPT</button>
                             </div>
                             <div class="col-sm-2">
                                 <button type="button" class="reject-btn btn btn-danger" data-new-status="REJECTED">REJECT</button>
                             </div>
+                            <% else %>
+                            <div class="col-sm-4"></div>
+                            <% end %>
                         </div>
                     </td>
                 </tr>

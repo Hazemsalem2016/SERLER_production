@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
-  root 'browse#index'
+  # root 'browse#index'
   match "browse" => "browse#index", via: [:get]
 
   get 'welcome/landing'
-  #root 'welcome#landing'
+  root 'welcome#landing'
   get 'welcome/admin'
   get 'welcome/denied'
   

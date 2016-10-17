@@ -14,6 +14,10 @@ class WelcomeController < ApplicationController
         
         if roles.include? :user
             redirect_to search_index_path
+        elsif roles.include? :analyst
+            redirect_to evidence_sources_accepted_path
+        elsif roles.include? :moderator
+            redirect_to evidence_sources_new_submitted_path
         end
         
 

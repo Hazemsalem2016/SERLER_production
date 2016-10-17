@@ -12,8 +12,13 @@ class EvidenceSourcesController < ApplicationController
         # moderator and administrator
 
         roles = current_user.roles
-        if not roles.include? :moderator and roles.include? :administrator
+        if not roles.include? :moderator and not roles.include? :administrator
             redirect_to welcome_denied_path
+        end
+
+        @editable = false
+        if roles.include? :moderator
+            @editable = true
         end
 
         @evidence_sources = EvidenceSource.where 'status=?', 'NEW'
@@ -23,7 +28,7 @@ class EvidenceSourcesController < ApplicationController
         # admistrator ? maybe
 
         roles = current_user.roles
-        if not roles.include? :moderator and roles.include? :administrator
+        if not roles.include? :moderator and not roles.include? :administrator
             redirect_to welcome_denied_path
         end
 
@@ -31,6 +36,21 @@ class EvidenceSourcesController < ApplicationController
     end
     
     def accepted
+
+        @showable = false
+        @editable = false
+
+        roles = current_user.roles
+
+        if roles.include? :moderator
+            @showable = true
+        end
+
+        if roles.include? :analyst or roles.include? :administrator
+            @showable = true
+            @editable = true
+        end
+
         # analystv and administrator
         @evidence_sources = EvidenceSource.where 'status=?', 'ACCEPTED'
     end
@@ -154,7 +174,7 @@ class EvidenceSourcesController < ApplicationController
         @editable = false
 
         if roles.include? :moderator
-            @sowable = true
+            @showable = true
         end
 
         if roles.include? :analyst

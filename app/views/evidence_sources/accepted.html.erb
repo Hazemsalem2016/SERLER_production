@@ -15,11 +15,16 @@
                                 <div class="col-sm-1">
                                     <a class="btn btn-default btn-sm" role="button" href="/evidence_sources/<%=es.id%>">SHOW</a>
                                 </div>
+                                <% if @editable %>
                                 <div class="col-sm-1">
                                     <a class="btn btn-primary btn-sm" role="button" href="/evidence_sources/<%=es.id%>/edit">EDIT</a>
                                 </div>
+                                <% else %>
+                                <div class="col-sm-1"></div>
+                                <% end %>
                                 <div class="col-sm-1"></div>
                                 </div>
+
                             </div>
                         </td>
                     </tr>
